@@ -1,5 +1,5 @@
 // Added import
-import { React, useMemo, useState } from 'react'
+import { React, useMemo, useState, memo } from 'react'
 
 interface WalletBalance {
   currency: string
@@ -39,10 +39,27 @@ export const WalletPage: React.FC<Props> = (props: Props) => {
   const { formattedBalances } = useWalletBalances()
   const { prices } = usePrices()
 
-  // It's seems function are using formattedBalances
-  const rows = formattedBalances.map(
-    (balance: FormattedWalletBalance, index: number) => {
+  return (
+    <div {...rest}>
+      <WalletRowList formattedBalances={formattedBalances} prices={prices} />
+    </div>
+  )
+}
+
+interface WalletRowListProps {
+  formattedBalances: FormattedWalletBalance[]
+  prices: any
+  classes: {
+    row: string
+  }
+}
+export const WalletRowList = memo(
+  ({ formattedBalances, prices, classes }: WalletRowListProps) => {
+    const rows = formattedBalances.map((balance, index) => {
+      // Can be put usdValue to interface and transform in format balances.
+      // So this can be optimize usePrices in page and binding list here
       const usdValue = prices[balance.currency] * balance.amount
+
       return (
         <WalletRow
           className={classes.row}
@@ -52,13 +69,13 @@ export const WalletPage: React.FC<Props> = (props: Props) => {
           formattedAmount={balance.formatted}
         />
       )
-    }
-  )
+    })
 
-  return <div {...rest}>{rows}</div>
-}
+    return <>{rows}</>
+  }
+)
 
-// Assume this is hook  useWalletBalances()
+// Assume this is hook useWalletBalances()
 export function useWalletBalances() {
   const [balances, setBalances] = useState<WalletBalance[]>([])
 
@@ -96,6 +113,7 @@ export function useWalletBalances() {
   }
 }
 
+// Assume this is hook usePrices()
 export function usePrices() {
   const [prices, setPrices] = useState<any>()
 
