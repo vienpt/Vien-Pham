@@ -56,8 +56,13 @@ interface WalletRowListProps {
 export const WalletRowList = memo(
   ({ formattedBalances, prices, classes }: WalletRowListProps) => {
     const rows = formattedBalances.map((balance, index) => {
-      // Can be put usdValue to interface and transform in format balances.
-      // So this can be optimize usePrices in page and binding list here
+      /**
+       * Purpose of this implementation is unclear.
+       * Here are some alternative solutions:
+       * 1. Add usdValue to the interface and transform it in formatBalances
+       * 2. Optimize usePrices hook implementation at page level and list binding
+       * 3. Calculate values in WalletRow component using computed properties
+       */
       const usdValue = prices[balance.currency] * balance.amount
 
       return (
