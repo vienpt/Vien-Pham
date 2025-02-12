@@ -1,24 +1,100 @@
+<!doctype html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fancy Form</title>
-
-    <!-- You may add more stuff here -->
     <link href="style.css" rel="stylesheet" />
+    <!-- Add Alpine.js -->
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script src="script.js"></script>
   </head>
 
   <body>
-    <!-- You may reorganise the whole HTML, as long as your form achieves the same effect. -->
-    <form onsubmit="return !1">
-      <h5>Swap</h5>
-      <label for="input-amount">Amount to send</label>
-      <input id="input-amount" />
+    <div x-data="swapForm">
+      <form @submit.prevent>
+        <h5>Swap</h5>
 
-      <label for="output-amount">Amount to receive</label>
-      <input id="output-amount" />
+        <!-- send field -->
+        <div class="form-field">
+          <label for="input-amount">Amount to send</label>
+          <div class="form-field-wrapper">
+            <img
+              :src="getTokenIcon(state.input.currency)"
+              :alt="state.input.currency"
+              class="currency-icon"
+            />
+            <input
+              id="input-amount"
+              type="text"
+              placeholder="0.00"
+              x-model="state.input.amount"
+              @input="handleInputAmount($event)"
+            />
+            <select
+              x-model="state.input.currency"
+              @change="handleCurrencyChange"
+            >
+              <template x-for="currency in state.currencies" :key="currency">
+                <option :value="currency" x-text="currency"></option>
+              </template>
+            </select>
+          </div>
+        </div>
 
-      <button>CONFIRM SWAP</button>
-    </form>
-    <script type="module" src="script.js"></script>
+        <!-- receive field -->
+        <div class="form-field">
+          <label for="output-amount">Amount to receive</label>
+          <div class="form-field-wrapper">
+            <img
+              :src="getTokenIcon(state.output.currency)"
+              :alt="state.output.currency"
+              class="currency-icon"
+            />
+            <input
+              id="output-amount"
+              type="text"
+              placeholder="0.00"
+              x-model="state.output.amount"
+              @input="handleOutputAmount($event)"
+            />
+            <select
+              x-model="state.output.currency"
+              @change="handleCurrencyChange"
+            >
+              <template x-for="currency in state.currencies" :key="currency">
+                <option :value="currency" x-text="currency"></option>
+              </template>
+            </select>
+          </div>
+        </div>
+
+        <!-- Error Display -->
+        <div
+          x-show="state.error"
+          x-text="state.error"
+          class="error-message"
+        ></div>
+
+        <!-- Swap Button -->
+        <button
+          @click="handleSwap"
+          :disabled="!isValid || state.loading"
+          class="swap-button"
+        >
+          <template x-if="state.loading">
+            <div class="spinner-container">
+              <div class="spinner"></div>
+              <span>Processing...</span>
+            </div>
+          </template>
+          <template x-if="!state.loading">
+            <span>CONFIRM SWAP</span>
+          </template>
+        </button>
+      </form>
+    </div>
   </body>
 </html>
